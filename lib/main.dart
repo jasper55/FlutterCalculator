@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_workshop/app/app.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_workshop/app/CalculatorApp.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  runApp(CalculatorApp());
+}
