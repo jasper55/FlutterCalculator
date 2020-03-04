@@ -29,12 +29,13 @@ class _CalculatorState extends State<Calculator> {
         }
       } else {
         if (secondNumber == null) {
-        secondNumber = input;
-        resultText = "$firstNumber ${activeOperationSymbol.name} $secondNumber";
+          secondNumber = input;
+          resultText =
+              "$firstNumber ${activeOperationSymbol.name} $secondNumber";
         } else {
           secondNumber = secondNumber * 10 + input;
-          resultText = "$firstNumber ${activeOperationSymbol.name} $secondNumber";
-
+          resultText =
+              "$firstNumber ${activeOperationSymbol.name} $secondNumber";
         }
       }
     });
@@ -143,54 +144,87 @@ class _CalculatorState extends State<Calculator> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Row(children: [
-        Column(children: <Widget>[
-          Column(children: [
-            Row(children: <Widget>[
-              new Container(
-                padding: EdgeInsets.all(8.0),
-                child: new InkWell(
-                    child: new Text(
-                  resultText.toString(),
-                  textAlign: TextAlign.right,
-                )),
-              )
-            ])
-          ]),
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Column(children: <Widget>[
+            Flexible(
+                child: AspectRatio(
+              aspectRatio: 4,
+              child: new Text(
+                resultText.toString(),
+                textAlign: TextAlign.right,
+              ),
+            )),
+//            Row(children: <Widget>[
+//              new Container(
+//                padding: EdgeInsets.all(8.0),
+//                child: new InkWell(
+//                    child: new Text(
+//                  resultText.toString(),
+//                  textAlign: TextAlign.right,
+//                )),
+//              )
+//            ])
 //        ResultContainer(),
 //        OperatorContainer(),
           Row(children: <Widget>[
-            actionButton(ActionSymbol.CANCEL),
-            operatorButton(OperatorSymbol.DIVIDE),
-            operatorButton(OperatorSymbol.MULTIPLY),
-            actionButton(ActionSymbol.DELETE),
+            Flexible(
+                child: AspectRatio(
+                    aspectRatio: 1, child: actionButton(ActionSymbol.CANCEL))),
+            Flexible(
+                child: AspectRatio(
+                    aspectRatio: 1,
+                    child: operatorButton(OperatorSymbol.DIVIDE))),
+            Flexible(
+                child: AspectRatio(
+                    aspectRatio: 1,
+                    child: operatorButton(OperatorSymbol.MULTIPLY))),
+            Flexible(
+              child: AspectRatio(
+                  aspectRatio: 1, child: actionButton(ActionSymbol.DELETE)),
+            ),
           ]),
           Column(children: [
             Row(children: <Widget>[
-              numberButton(7),
-              numberButton(8),
-              numberButton(9),
-              operatorButton(OperatorSymbol.MINUS)
+              Flexible(
+                  child: AspectRatio(aspectRatio: 1, child: numberButton(7))),
+              Flexible(
+                  child: AspectRatio(aspectRatio: 1, child: numberButton(8))),
+              Flexible(
+                  child: AspectRatio(aspectRatio: 1, child: numberButton(9))),
+              Flexible(
+                child: AspectRatio(
+                    aspectRatio: 1,
+                    child: operatorButton(OperatorSymbol.MINUS)),
+              ),
             ]),
             Row(children: <Widget>[
-              numberButton(4),
-              numberButton(5),
-              numberButton(6),
-              operatorButton(OperatorSymbol.PLUS)
+              Flexible(
+                  child: AspectRatio(aspectRatio: 1, child: numberButton(4))),
+              Flexible(
+                  child: AspectRatio(aspectRatio: 1, child: numberButton(5))),
+              Flexible(
+                  child: AspectRatio(aspectRatio: 1, child: numberButton(6))),
+              Flexible(
+                child: AspectRatio(
+                    aspectRatio: 1, child: operatorButton(OperatorSymbol.PLUS)),
+              ),
             ]),
             Row(children: <Widget>[
-              numberButton(1),
-              numberButton(2),
-              numberButton(3),
-              enterButton(ActionSymbol.ENTER)
+              Flexible(
+                  child: AspectRatio(aspectRatio: 1, child: numberButton(1))),
+              Flexible(
+                  child: AspectRatio(aspectRatio: 1, child: numberButton(2))),
+              Flexible(
+                  child: AspectRatio(aspectRatio: 1, child: numberButton(3))),
+              Flexible(
+                child: AspectRatio(
+                    aspectRatio: 1, child: enterButton(ActionSymbol.ENTER)),
+              ),
             ]),
           ]),
-        ])
-      ]),
-    );
+        ]));
   }
 } //_Calc
 
