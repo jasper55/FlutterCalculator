@@ -17,15 +17,25 @@ class _CalculatorState extends State<Calculator> {
   OperatorSymbol activeOperationSymbol;
   bool firstNumberAlreadyTyped = false;
 
-
   void onNumberPressed(int input) {
     setState(() {
-      if (firstNumberAlreadyTyped == false) {
-        firstNumber = input;
-        resultText = input.toString();
+      if (activeOperationSymbol == null) {
+        if (firstNumber == null) {
+          firstNumber = input;
+          resultText = firstNumber.toString();
+        } else {
+          firstNumber = firstNumber * 10 + input;
+          resultText = firstNumber.toString();
+        }
       } else {
+        if (secondNumber == null) {
         secondNumber = input;
-        resultText = "$firstNumber ${activeOperationSymbol.name} $input";
+        resultText = "$firstNumber ${activeOperationSymbol.name} $secondNumber";
+        } else {
+          secondNumber = secondNumber * 10 + input;
+          resultText = "$firstNumber ${activeOperationSymbol.name} $secondNumber";
+
+        }
       }
     });
   }
@@ -34,13 +44,12 @@ class _CalculatorState extends State<Calculator> {
     setState(() {
       activeOperationSymbol = operatorSymbol;
       resultText = "$firstNumber ${activeOperationSymbol.name}";
-      firstNumberAlreadyTyped = true;
+//      firstNumberAlreadyTyped = true;
     });
   }
 
   void onEnterPressed() {
     setState(() {
-
       if (firstNumber == null || secondNumber == null) {
         resultText = "Enter number";
         return;
@@ -59,9 +68,10 @@ class _CalculatorState extends State<Calculator> {
             firstNumber = firstNumber - secondNumber;
             break;
         }
-        firstNumberAlreadyTyped = true;
+//        firstNumberAlreadyTyped = true;
         secondNumber = null;
         resultText = firstNumber.toString();
+        activeOperationSymbol = null;
       }
     });
   }
@@ -71,9 +81,9 @@ class _CalculatorState extends State<Calculator> {
       switch (actionSymbol) {
         case ActionSymbol.DELETE:
           {
-            if (firstNumber == 0) {
+            if (firstNumber == null) {
               return;
-            } else if (firstNumber != 0 && secondNumber == 0) {
+            } else if (firstNumber != null && secondNumber == null) {
               return;
             } else {
               return;
@@ -82,7 +92,8 @@ class _CalculatorState extends State<Calculator> {
           break;
 
         case ActionSymbol.CANCEL:
-          firstNumberAlreadyTyped = false;
+          activeOperationSymbol = null;
+//          firstNumberAlreadyTyped = false;
           firstNumber = null;
           secondNumber = null;
           resultText = "...";
@@ -129,9 +140,6 @@ class _CalculatorState extends State<Calculator> {
     );
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,9 +154,9 @@ class _CalculatorState extends State<Calculator> {
                 padding: EdgeInsets.all(8.0),
                 child: new InkWell(
                     child: new Text(
-                      resultText.toString(),
-                      textAlign: TextAlign.right,
-                    )),
+                  resultText.toString(),
+                  textAlign: TextAlign.right,
+                )),
               )
             ])
           ]),
@@ -184,8 +192,6 @@ class _CalculatorState extends State<Calculator> {
       ]),
     );
   }
-
-
 } //_Calc
 
 class NumberButton extends StatelessWidget {
