@@ -10,22 +10,63 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
+  final key = new GlobalKey<_CalculatorState>();
   int firstNumber = 0;
   int secondNumber = 0;
-  double result;
+  double result = 0.0;
   OperatorSymbol activeCalculationSymbol;
   ActionSymbol activeActionSymbol;
-  VoidCallback methodCallBack;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Body(activeCalculationSymbol,activeActionSymbol,methodCallBack),
-      ),
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Row(children: [
+          Column(children: <Widget>[
+            Column(children: [
+              Row(children: <Widget>[
+                new Container(
+                  padding: EdgeInsets.all(8.0),
+                  child: new InkWell(
+                      child: new Text(
+                        result.toString(),
+                        textAlign: TextAlign.right,
+                      )),
+                )
+              ])
+            ]),
+//        ResultContainer(),
+//        OperatorContainer(),
+            Row(children: <Widget>[
+              actionButton(ActionSymbol.CANCEL),
+              operatorButton(OperatorSymbol.DIVIDE),
+              operatorButton(OperatorSymbol.MULTIPLY),
+              actionButton(ActionSymbol.DELETE),
+            ]),
+            Column(children: [
+              Row(children: <Widget>[
+                numberButton(7),
+                numberButton(8),
+                numberButton(9),
+                operatorButton(OperatorSymbol.MINUS)
+              ]),
+              Row(children: <Widget>[
+                numberButton(4),
+                numberButton(5),
+                numberButton(6),
+                operatorButton(OperatorSymbol.PLUS)
+              ]),
+              Row(children: <Widget>[
+                numberButton(1),
+                numberButton(2),
+                numberButton(3),
+                enterButton(ActionSymbol.ENTER)
+              ]),
+            ]),
+          ])
+        ]),
     );
   }
 
@@ -35,6 +76,7 @@ class _CalculatorState extends State<Calculator> {
     } else {
       secondNumber = number;
     }
+    result = number.toDouble();
   }
 
   void setActiveOperator(OperatorSymbol operatorSymbol) {
@@ -67,7 +109,8 @@ class _CalculatorState extends State<Calculator> {
     });
   }
 
-  void onActionPressed() {
+  void onActionPressed(ActionSymbol actionSymbol) {
+    activeActionSymbol = actionSymbol;
     setState(() {
       switch (activeActionSymbol) {
         case ActionSymbol.DELETE:
@@ -92,110 +135,59 @@ class _CalculatorState extends State<Calculator> {
       }
     });
   }
-}
 
-class Body extends StatelessWidget {
-  OperatorSymbol activeCalculationSymbol;
-  ActionSymbol activeActionSymbol;
-  VoidCallback methodCallBack;
 
-  Body(this.activeCalculationSymbol, this.activeActionSymbol, this.methodCallBack);
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(children: [
-      Column(children: <Widget>[
-        ResultContainer(),
-        OperatorContainer(),
-        NumberContainer(methodCallBack),
-      ])
-    ]);
-  }
-}
 
-class ResultContainer extends StatelessWidget {
-  ResultContainer();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(children: [
-      Row(children: <Widget>[
-        ResultScreen(),
-      ])
-    ]);
-  }
-}
-
-class OperatorContainer extends StatelessWidget {
-  OperatorContainer();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(children: [
-      Row(children: <Widget>[
-        ActionButton(ActionSymbol.CANCEL),
-        OperatorButton(OperatorSymbol.DIVIDE),
-        OperatorButton(OperatorSymbol.MULTIPLY),
-        ActionButton(ActionSymbol.DELETE),
-      ])
-    ]);
-  }
-}
-
-class ResultScreen extends StatelessWidget {
-  ResultScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return new Container(
-      padding: EdgeInsets.all(8.0),
-      child: new InkWell(
-          child: new Text(
-        "...",
-        textAlign: TextAlign.right,
-      )),
+  NumberButton numberButton(int number) {
+    return NumberButton(
+      number: number,
+      onNumberPressed: () {
+        onNumberPressed(number);
+      },
     );
   }
 
-  void updateText(int number) {}
-}
-
-class NumberContainer extends StatelessWidget {
-  VoidCallback methodCallback;
-
-  NumberContainer(this.methodCallback);
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(children: [
-      Row(children: <Widget>[
-        NumberButton(7,methodCallback),
-        NumberButton(8),
-        NumberButton(9),
-        OperatorButton(OperatorSymbol.MINUS)
-      ]),
-      Row(children: <Widget>[
-        NumberButton(4),
-        NumberButton(5),
-        NumberButton(6),
-        OperatorButton(OperatorSymbol.PLUS)
-      ]),
-      Row(children: <Widget>[
-        NumberButton(1),
-        NumberButton(2),
-        NumberButton(3),
-        ActionButton(ActionSymbol.ENTER)
-      ]),
-    ]);
+  ActionButton actionButton(ActionSymbol symbol) {
+    return ActionButton(
+      actionSymbol: symbol,
+      onActionPressed: () {
+        onActionPressed(symbol);
+      },
+    );
   }
-}
+
+  EnterButton enterButton(ActionSymbol symbol) {
+    return EnterButton(
+      actionSymbol: symbol,
+      onEnterPressed: () {
+        onEnterPressed();
+      },
+    );
+  }
+
+
+  OperatorButton operatorButton(OperatorSymbol symbol) {
+    return OperatorButton(
+      operatorSymbol: symbol,
+      onOperatorPressed: () {
+        setActiveOperator(symbol);
+      },
+    );
+  }
+
+
+} //_Calc
+
+
+
 
 class NumberButton extends StatelessWidget {
-  VoidCallback methodCallback;
   final int number;
+  final VoidCallback onNumberPressed;
 
-  NumberButton(this.number, this.methodCallback);
+  const NumberButton({Key key, this.number, this.onNumberPressed,})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -213,8 +205,11 @@ class NumberButton extends StatelessWidget {
 
 class ActionButton extends StatelessWidget {
   final ActionSymbol actionSymbol;
+  final VoidCallback onActionPressed;
 
-  ActionButton(this.actionSymbol);
+
+  const ActionButton({Key key, this.actionSymbol,this.onActionPressed,})
+  : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -224,6 +219,30 @@ class ActionButton extends StatelessWidget {
       child: new InkWell(
         child: new Text(actionSymbol.name,
             style: TextStyle(fontSize: 30, color: Colors.black)),
+        onTap: onActionPressed,
+      ),
+    );
+  }
+}
+
+
+class EnterButton extends StatelessWidget {
+  final ActionSymbol actionSymbol;
+  final VoidCallback onEnterPressed;
+
+
+  const EnterButton({Key key, this.actionSymbol,this.onEnterPressed,})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return new Container(
+      padding: EdgeInsets.all(8.0),
+      color: Colors.green,
+      child: new InkWell(
+        child: new Text(actionSymbol.name,
+            style: TextStyle(fontSize: 30, color: Colors.black)),
+        onTap: onEnterPressed,
       ),
     );
   }
@@ -231,8 +250,11 @@ class ActionButton extends StatelessWidget {
 
 class OperatorButton extends StatelessWidget {
   final OperatorSymbol operatorSymbol;
+  final VoidCallback onOperatorPressed;
 
-  OperatorButton(this.operatorSymbol);
+
+  const OperatorButton({Key key, this.operatorSymbol, this.onOperatorPressed,})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -242,6 +264,7 @@ class OperatorButton extends StatelessWidget {
       child: new InkWell(
         child: new Text(operatorSymbol.name,
             style: TextStyle(fontSize: 30, color: Colors.black)),
+        onTap: onOperatorPressed,
       ),
     );
   }
@@ -293,3 +316,148 @@ extension ActionString on ActionSymbol {
     return character;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+//class ResultContainer extends StatelessWidget {
+//  ResultContainer();
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return Column(children: [
+//      Row(children: <Widget>[
+//        ResultScreen(),
+//      ])
+//    ]);
+//  }
+//}
+//
+//
+//
+//class ResultScreen extends StatelessWidget {
+//  ResultScreen();
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return new Container(
+//      padding: EdgeInsets.all(8.0),
+//      child: new InkWell(
+//          child: new Text(
+//            "...",
+//            textAlign: TextAlign.right,
+//          )),
+//    );
+//  }
+//
+//  void updateText(int number) {}
+//}
+
+
+
+
+//class NumberContainer extends StatelessWidget {
+//  NumberContainer();
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return Column(children: [
+//      Row(children: <Widget>[
+//        NumberButton(7),
+//        NumberButton(8),
+//        NumberButton(9),
+//        OperatorButton(OperatorSymbol.MINUS)
+//      ]),
+//      Row(children: <Widget>[
+//        NumberButton(4),
+//        NumberButton(5),
+//        NumberButton(6),
+//        OperatorButton(OperatorSymbol.PLUS)
+//      ]),
+//      Row(children: <Widget>[
+//        NumberButton(1),
+//        NumberButton(2),
+//        NumberButton(3),
+//        ActionButton(ActionSymbol.ENTER)
+//      ]),
+//    ]);
+//  }
+//}
+
+
+//class Body extends StatelessWidget {
+//  Body();
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return Row(children: [
+//      Column(children: <Widget>[
+//        Column(children: [
+//          Row(children: <Widget>[
+//            new Container(
+//              padding: EdgeInsets.all(8.0),
+//              child: new InkWell(
+//                  child: new Text(
+//                    "...",
+//                    textAlign: TextAlign.right,
+//                  )),
+//            )
+//          ])
+//        ]),
+////        ResultContainer(),
+////        OperatorContainer(),
+//        Row(children: <Widget>[
+//          ActionButton(ActionSymbol.CANCEL),
+//          OperatorButton(OperatorSymbol.DIVIDE),
+//          OperatorButton(OperatorSymbol.MULTIPLY),
+//          ActionButton(ActionSymbol.DELETE),
+//        ]),
+//        Column(children: [
+//          Row(children: <Widget>[
+//            NumberButton(7),
+//            NumberButton(8),
+//            NumberButton(9),
+//            OperatorButton(OperatorSymbol.MINUS)
+//          ]),
+//          Row(children: <Widget>[
+//            NumberButton(4),
+//            NumberButton(5),
+//            NumberButton(6),
+//            OperatorButton(OperatorSymbol.PLUS)
+//          ]),
+//          Row(children: <Widget>[
+//            NumberButton(1),
+//            NumberButton(2),
+//            NumberButton(3),
+//            ActionButton(ActionSymbol.ENTER)
+//          ]),
+//        ]),
+//      ])
+//    ]);
+//  }
+//}
+
+
+//class OperatorContainer extends StatelessWidget {
+//  OperatorContainer();
+//
+//  @override
+//  Widget build(BuildContext context) {
+//    return Column(children: [
+//      Row(children: <Widget>[
+//        ActionButton(ActionSymbol.CANCEL),
+//        OperatorButton(OperatorSymbol.DIVIDE),
+//        OperatorButton(OperatorSymbol.MULTIPLY),
+//        ActionButton(ActionSymbol.DELETE),
+//      ])
+//    ]);
+//  }
+//}

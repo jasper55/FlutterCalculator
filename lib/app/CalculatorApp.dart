@@ -8,7 +8,6 @@ class CalculatorApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(primarySwatch: Colors.teal),
       home: Calculator(title: 'Flutter Calculator'),
-//      home: Calculator(),
     );
   }
 }
