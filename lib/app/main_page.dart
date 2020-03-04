@@ -14,62 +14,61 @@ class _CalculatorState extends State<Calculator> {
   int firstNumber;
   int secondNumber;
   String resultText = "...";
-  OperatorSymbol activeCalculationSymbol;
-  ActionSymbol activeActionSymbol;
-  bool firstNumberActive = true;
+  OperatorSymbol activeOperationSymbol;
+  bool firstNumberAlreadyTyped = false;
 
 
   void onNumberPressed(int input) {
     setState(() {
-      if (firstNumberActive) {
+      if (firstNumberAlreadyTyped == false) {
         firstNumber = input;
+        resultText = input.toString();
       } else {
         secondNumber = input;
+        resultText = "$firstNumber ${activeOperationSymbol.name} $input";
       }
-      resultText = input.toString();
     });
   }
 
   void setActiveOperator(OperatorSymbol operatorSymbol) {
     setState(() {
-      firstNumberActive = !firstNumberActive;
-      activeCalculationSymbol = operatorSymbol;
-      resultText = activeCalculationSymbol.name;
+      activeOperationSymbol = operatorSymbol;
+      resultText = "$firstNumber ${activeOperationSymbol.name}";
+      firstNumberAlreadyTyped = true;
     });
   }
 
   void onEnterPressed() {
     setState(() {
-      int result;
+
       if (firstNumber == null || secondNumber == null) {
         resultText = "Enter number";
         return;
       } else {
-        switch (activeCalculationSymbol) {
+        switch (activeOperationSymbol) {
           case OperatorSymbol.DIVIDE:
-            result = firstNumber ~/ secondNumber;
+            firstNumber = firstNumber ~/ secondNumber;
             break;
           case OperatorSymbol.MULTIPLY:
-            result = firstNumber * secondNumber;
+            firstNumber = firstNumber * secondNumber;
             break;
           case OperatorSymbol.PLUS:
-            result = firstNumber + secondNumber;
+            firstNumber = firstNumber + secondNumber;
             break;
           case OperatorSymbol.MINUS:
-            result = firstNumber - secondNumber;
+            firstNumber = firstNumber - secondNumber;
             break;
         }
-        firstNumber = result;
-        firstNumberActive = false;
-        resultText = result.toString();
+        firstNumberAlreadyTyped = true;
+        secondNumber = null;
+        resultText = firstNumber.toString();
       }
     });
   }
 
   void onActionPressed(ActionSymbol actionSymbol) {
     setState(() {
-      activeActionSymbol = actionSymbol;
-      switch (activeActionSymbol) {
+      switch (actionSymbol) {
         case ActionSymbol.DELETE:
           {
             if (firstNumber == 0) {
@@ -83,12 +82,13 @@ class _CalculatorState extends State<Calculator> {
           break;
 
         case ActionSymbol.CANCEL:
+          firstNumberAlreadyTyped = false;
           firstNumber = null;
           secondNumber = null;
           resultText = "...";
           break;
         case ActionSymbol.ENTER:
-          break;
+          return;
       }
     });
   }
