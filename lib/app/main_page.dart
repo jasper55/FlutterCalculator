@@ -11,107 +11,64 @@ class Calculator extends StatefulWidget {
 
 class _CalculatorState extends State<Calculator> {
   final key = new GlobalKey<_CalculatorState>();
-  int firstNumber = 0;
-  int secondNumber = 0;
-  double result = 0.0;
+  int firstNumber;
+  int secondNumber;
+  String resultText = "...";
   OperatorSymbol activeCalculationSymbol;
   ActionSymbol activeActionSymbol;
+  bool firstNumberActive = true;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: Row(children: [
-          Column(children: <Widget>[
-            Column(children: [
-              Row(children: <Widget>[
-                new Container(
-                  padding: EdgeInsets.all(8.0),
-                  child: new InkWell(
-                      child: new Text(
-                        result.toString(),
-                        textAlign: TextAlign.right,
-                      )),
-                )
-              ])
-            ]),
-//        ResultContainer(),
-//        OperatorContainer(),
-            Row(children: <Widget>[
-              actionButton(ActionSymbol.CANCEL),
-              operatorButton(OperatorSymbol.DIVIDE),
-              operatorButton(OperatorSymbol.MULTIPLY),
-              actionButton(ActionSymbol.DELETE),
-            ]),
-            Column(children: [
-              Row(children: <Widget>[
-                numberButton(7),
-                numberButton(8),
-                numberButton(9),
-                operatorButton(OperatorSymbol.MINUS)
-              ]),
-              Row(children: <Widget>[
-                numberButton(4),
-                numberButton(5),
-                numberButton(6),
-                operatorButton(OperatorSymbol.PLUS)
-              ]),
-              Row(children: <Widget>[
-                numberButton(1),
-                numberButton(2),
-                numberButton(3),
-                enterButton(ActionSymbol.ENTER)
-              ]),
-            ]),
-          ])
-        ]),
-    );
-  }
 
-  void onNumberPressed(int number) {
-    if (firstNumber == 0) {
-      firstNumber = number;
-    } else {
-      secondNumber = number;
-    }
-    result = number.toDouble();
+  void onNumberPressed(int input) {
+    setState(() {
+      if (firstNumberActive) {
+        firstNumber = input;
+      } else {
+        secondNumber = input;
+      }
+      resultText = input.toString();
+    });
   }
 
   void setActiveOperator(OperatorSymbol operatorSymbol) {
     setState(() {
+      firstNumberActive = !firstNumberActive;
       activeCalculationSymbol = operatorSymbol;
+      resultText = activeCalculationSymbol.name;
     });
   }
 
   void onEnterPressed() {
     setState(() {
-      if (firstNumber == 0 || secondNumber == 0) {
+      int result;
+      if (firstNumber == null || secondNumber == null) {
+        resultText = "Enter number";
         return;
       } else {
         switch (activeCalculationSymbol) {
           case OperatorSymbol.DIVIDE:
-            result = firstNumber / secondNumber;
+            result = firstNumber ~/ secondNumber;
             break;
           case OperatorSymbol.MULTIPLY:
-            result = (firstNumber * secondNumber) as double;
+            result = firstNumber * secondNumber;
             break;
           case OperatorSymbol.PLUS:
-            result = (firstNumber + secondNumber) as double;
+            result = firstNumber + secondNumber;
             break;
           case OperatorSymbol.MINUS:
-            result = (firstNumber - secondNumber) as double;
+            result = firstNumber - secondNumber;
             break;
         }
+        firstNumber = result;
+        firstNumberActive = false;
+        resultText = result.toString();
       }
-      updateDisplay(result.toString());
     });
   }
 
   void onActionPressed(ActionSymbol actionSymbol) {
-    activeActionSymbol = actionSymbol;
     setState(() {
+      activeActionSymbol = actionSymbol;
       switch (activeActionSymbol) {
         case ActionSymbol.DELETE:
           {
@@ -126,18 +83,15 @@ class _CalculatorState extends State<Calculator> {
           break;
 
         case ActionSymbol.CANCEL:
-          firstNumber = 0;
-          secondNumber = 0;
-          result = 0;
+          firstNumber = null;
+          secondNumber = null;
+          resultText = "...";
           break;
         case ActionSymbol.ENTER:
           break;
       }
     });
   }
-
-
-
 
   NumberButton numberButton(int number) {
     return NumberButton(
@@ -166,7 +120,6 @@ class _CalculatorState extends State<Calculator> {
     );
   }
 
-
   OperatorButton operatorButton(OperatorSymbol symbol) {
     return OperatorButton(
       operatorSymbol: symbol,
@@ -177,17 +130,73 @@ class _CalculatorState extends State<Calculator> {
   }
 
 
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Row(children: [
+        Column(children: <Widget>[
+          Column(children: [
+            Row(children: <Widget>[
+              new Container(
+                padding: EdgeInsets.all(8.0),
+                child: new InkWell(
+                    child: new Text(
+                      resultText.toString(),
+                      textAlign: TextAlign.right,
+                    )),
+              )
+            ])
+          ]),
+//        ResultContainer(),
+//        OperatorContainer(),
+          Row(children: <Widget>[
+            actionButton(ActionSymbol.CANCEL),
+            operatorButton(OperatorSymbol.DIVIDE),
+            operatorButton(OperatorSymbol.MULTIPLY),
+            actionButton(ActionSymbol.DELETE),
+          ]),
+          Column(children: [
+            Row(children: <Widget>[
+              numberButton(7),
+              numberButton(8),
+              numberButton(9),
+              operatorButton(OperatorSymbol.MINUS)
+            ]),
+            Row(children: <Widget>[
+              numberButton(4),
+              numberButton(5),
+              numberButton(6),
+              operatorButton(OperatorSymbol.PLUS)
+            ]),
+            Row(children: <Widget>[
+              numberButton(1),
+              numberButton(2),
+              numberButton(3),
+              enterButton(ActionSymbol.ENTER)
+            ]),
+          ]),
+        ])
+      ]),
+    );
+  }
+
+
 } //_Calc
-
-
-
 
 class NumberButton extends StatelessWidget {
   final int number;
   final VoidCallback onNumberPressed;
 
-  const NumberButton({Key key, this.number, this.onNumberPressed,})
-      : super(key: key);
+  const NumberButton({
+    Key key,
+    this.number,
+    this.onNumberPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -207,9 +216,11 @@ class ActionButton extends StatelessWidget {
   final ActionSymbol actionSymbol;
   final VoidCallback onActionPressed;
 
-
-  const ActionButton({Key key, this.actionSymbol,this.onActionPressed,})
-  : super(key: key);
+  const ActionButton({
+    Key key,
+    this.actionSymbol,
+    this.onActionPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -225,14 +236,15 @@ class ActionButton extends StatelessWidget {
   }
 }
 
-
 class EnterButton extends StatelessWidget {
   final ActionSymbol actionSymbol;
   final VoidCallback onEnterPressed;
 
-
-  const EnterButton({Key key, this.actionSymbol,this.onEnterPressed,})
-      : super(key: key);
+  const EnterButton({
+    Key key,
+    this.actionSymbol,
+    this.onEnterPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -252,9 +264,11 @@ class OperatorButton extends StatelessWidget {
   final OperatorSymbol operatorSymbol;
   final VoidCallback onOperatorPressed;
 
-
-  const OperatorButton({Key key, this.operatorSymbol, this.onOperatorPressed,})
-      : super(key: key);
+  const OperatorButton({
+    Key key,
+    this.operatorSymbol,
+    this.onOperatorPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -268,10 +282,6 @@ class OperatorButton extends StatelessWidget {
       ),
     );
   }
-}
-
-void updateDisplay(String text) {
-//  ResultScreen.updateText(text);
 }
 
 enum OperatorSymbol { DIVIDE, MULTIPLY, PLUS, MINUS }
@@ -317,17 +327,6 @@ extension ActionString on ActionSymbol {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
 //class ResultContainer extends StatelessWidget {
 //  ResultContainer();
 //
@@ -361,9 +360,6 @@ extension ActionString on ActionSymbol {
 //  void updateText(int number) {}
 //}
 
-
-
-
 //class NumberContainer extends StatelessWidget {
 //  NumberContainer();
 //
@@ -391,7 +387,6 @@ extension ActionString on ActionSymbol {
 //    ]);
 //  }
 //}
-
 
 //class Body extends StatelessWidget {
 //  Body();
@@ -444,7 +439,6 @@ extension ActionString on ActionSymbol {
 //    ]);
 //  }
 //}
-
 
 //class OperatorContainer extends StatelessWidget {
 //  OperatorContainer();
